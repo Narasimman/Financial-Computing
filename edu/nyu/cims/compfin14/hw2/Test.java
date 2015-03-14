@@ -11,6 +11,12 @@ public class Test {
     public static void main(String[] args) {
 
         Test test = new Test();
+
+        YieldCurve initialyc = new YieldCurve();
+        /* Print the initial/Q3 yield curve object */
+        System.out.println("Q1.");
+        System.out.println(initialyc);
+
         /* A half year zero coupon bond with face value of 100$ traded at 95$ maturing in half a year */
         Bond b1 = new Bond(100, 95, 0.5);
         /* Another one with face value of 1000$ traded at 895$ maturing in a year */
@@ -22,7 +28,9 @@ public class Test {
 
         /* Print the yield curve */
         YieldCurve yc = new YieldCurve(bonds);
-        System.out.println("Q2. a. Yield Curve:");
+        System.out.println();
+        System.out.println("Q2. a.");
+        System.out.println("Yield Curve:");
         System.out.println(yc);
 
         /* What is getInterestRate(0.75) returns? */
@@ -34,10 +42,12 @@ public class Test {
         YieldCurve initialYieldCurve = new YieldCurve();
         /* Print the price */
         double priceOfBond = test.getPrice(initialYieldCurve, b3);
-        System.out.println("Q3. The price of the bond is : " + priceOfBond);
+        System.out.println();
+        System.out.println("Q3. a. The price of the bond is : " + priceOfBond);
 
-        System.out.println(test.getYTM(b3, priceOfBond));
-       
+        double ytm = test.getYTM(b3, priceOfBond);
+        System.out.println("b. YTM for the bond is : " + String.format("%.3f", ytm));
+
     }
 
     /**
@@ -48,13 +58,14 @@ public class Test {
      * @return
      */
     public double getPrice(YieldCurve yc, Bond bond) {
-        double price = 0.0, pf = 0.0;
+        double price = 0.0;
         Map<Double, Double> cashFlow = bond.getCashFlow();
-        if (bond.getPaymentFrequency() > 0) {
-            pf = 1 / bond.getPaymentFrequency();
-        }
-        for (double time = pf; time <= bond.getMaturity(); time += pf) {
-            price += cashFlow.get(time) / Math.pow(Math.E, yc.getInterestRate(time) * time);
+
+        for(Map.Entry<Double, Double> entry: cashFlow.entrySet()){
+            double coupon = entry.getValue();
+            double year = entry.getKey();
+
+            price += coupon / Math.exp((yc.getInterestRate(year) * year) / 100);
         }
         return price;
     }
@@ -66,7 +77,33 @@ public class Test {
      * @return
      */
     public double getYTM(Bond bond, double price) {
-        //return Math.log(bond.getFaceValue()/price) / bond.getMaturity();
-        return 0.0;
+
+        double ytm = 0.0, sum_of_payments = 0.0;
+        Map<Double, Double> cashFlow = bond.getCashFlow();
+
+        for(Map.Entry<Double, Double> entry: cashFlow.entrySet()) {
+            double year = entry.getKey();
+            double coupon = entry.getValue();
+
+            if(year == 0) continue;
+
+            sum_of_payments += (coupon * Math.exp(year));
+        }
+        ytm = Math.log(sum_of_payments);
+
+        return ytm;
+    }
+
+    /**
+     * Return price given ytm and bond
+     * @param bond
+     * @param ytm
+     * @return
+     */
+    public double getPrice(Bond bond, double ytm) {
+        double price = 0.0;
+
+        price = bond.getFaceValue() * Math.exp(-(ytm * bond.getMaturity());
+        return price;
     }
 }

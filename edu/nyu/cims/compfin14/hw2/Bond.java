@@ -14,24 +14,14 @@ public class Bond {
     private double paymentFrequency;
     private Map<Double,Double> cashFlow;
 
+    /**
+     * Zero coupon bond
+     * @param fv
+     * @param pr
+     * @param mt
+     */
     Bond(double fv, double pr, double mt){
         this(fv, 0, pr, mt, 0);
-    }
-
-    /**
-     * Zero Coupon Bond Constructor
-     * @param fv - Face value
-     * @param cp - coupon
-     * @param pr - price
-     * @param mt - Maturity
-     * @param pf - payment frequency
-     */
-    Bond(double fv, double cp, double pr, double mt, double pf){
-        faceValue = fv;
-        coupon = cp;
-        price = pr;
-        maturity = mt;
-        paymentFrequency = pf;
     }
 
     /**
@@ -42,8 +32,21 @@ public class Bond {
      * @param pf - Number of times the coupon payment is made.
      */
     Bond(double fv, double cp, double mt, double pf){
+        this(fv, cp, 0, mt, pf);
+    }
+
+    /**
+     * Coupon bonds constructor
+     * @param fv - Face value
+     * @param cp - coupon
+     * @param pr - price
+     * @param mt - Maturity
+     * @param pf - payment frequency
+     */
+    Bond(double fv, double cp, double pr, double mt, double pf){
         faceValue = fv;
         coupon = cp;
+        price = pr;
         maturity = mt;
         paymentFrequency = pf;
     }
@@ -69,8 +72,12 @@ public class Bond {
         return faceValue;
     }
 
+    /**
+     * Return a map of cash flow that can be used to calculate price of a bond
+     * @return
+     */
     public Map<Double,Double> getCashFlow() {
-        Map<Double, Double> cashFlow = new HashMap<Double, Double>();
+        cashFlow = new HashMap<Double, Double>();
 
         double coupon = getCoupon();
         double pf = 1/getPaymentFrequency();
