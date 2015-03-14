@@ -103,7 +103,7 @@ public class Test {
     public double getPrice(Bond bond, double ytm) {
         double price = 0.0;
 
-        price = bond.getFaceValue() * Math.exp(-(ytm * bond.getMaturity());
+        price = bond.getFaceValue() * Math.exp(-(ytm * bond.getMaturity()));
         return price;
     }
 }
