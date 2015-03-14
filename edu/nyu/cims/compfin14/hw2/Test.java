@@ -37,13 +37,13 @@ public class Test {
         System.out.println("b. The getInterestRate(0.75) returns: " + String.format("%.3f", yc.getInterestRate(0.75)));
 
         /* A 5% coupon bond with 500$ face value, which pays semi-annually and duration of three years */
-        Bond b3 = new Bond(500, 5, 3, 2);
+        Bond b3 = new Bond(500, 0.05, 3, 2);
 
         YieldCurve initialYieldCurve = new YieldCurve();
         /* Print the price */
         double priceOfBond = test.getPrice(initialYieldCurve, b3);
         System.out.println();
-        System.out.println("Q3. a. The price of the bond is : " + priceOfBond);
+        System.out.println("Q3. a. The price of the bond is : " + String.format("%.3f", priceOfBond));
 
         double ytm = test.getYTM(b3, priceOfBond);
         System.out.println("b. YTM for the bond is : " + String.format("%.3f", ytm));
@@ -77,19 +77,20 @@ public class Test {
      * @return
      */
     public double getYTM(Bond bond, double price) {
-
-        double ytm = 0.0, sum_of_payments = 0.0;
+        double newPrice = 0.0;
+        double ytm = 1.0;
         Map<Double, Double> cashFlow = bond.getCashFlow();
 
-        for(Map.Entry<Double, Double> entry: cashFlow.entrySet()) {
-            double year = entry.getKey();
-            double coupon = entry.getValue();
-
-            if(year == 0) continue;
-
-            sum_of_payments += (coupon * Math.exp(year));
-        }
-        ytm = Math.log(sum_of_payments);
+        do {
+            newPrice = 0.0;
+            ytm += 0.001;
+            for (Map.Entry<Double, Double> entry : cashFlow.entrySet()) {
+                double coupon = entry.getValue();
+                double year = entry.getKey();
+                newPrice += coupon / (Math.exp(ytm * year) / 100);
+            }
+           // System.out.println(price + " " + newPrice);
+        } while (price < newPrice);
 
         return ytm;
     }
