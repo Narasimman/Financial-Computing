@@ -37,7 +37,7 @@ public class Test {
         System.out.println("Q3. The price of the bond is : " + priceOfBond);
 
         System.out.println(test.getYTM(b3, priceOfBond));
-        System.out.println(test.getYTM2(b3, priceOfBond));
+       
     }
 
     /**
@@ -66,10 +66,7 @@ public class Test {
      * @return
      */
     public double getYTM(Bond bond, double price) {
-        return Math.log(bond.getFaceValue()/price) / bond.getMaturity();
-    }
-
-    public double getYTM2(Bond bond, double price) {
-        return Math.pow(bond.getFaceValue()/price, (1/bond.getMaturity()));
+        //return Math.log(bond.getFaceValue()/price) / bond.getMaturity();
+        return 0.0;
     }
 }
