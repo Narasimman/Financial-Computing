@@ -72,27 +72,42 @@ public class Test {
 
     /**
      * Return YTM
+     * We calculate the ytm by binary search
      * @param bond
      * @param price
      * @return
      */
     public double getYTM(Bond bond, double price) {
-        double newPrice = 0.0;
-        double ytm = 1.0;
-        Map<Double, Double> cashFlow = bond.getCashFlow();
+        double currentPrice = 0.0;
+        double lbYTM = 0.0, hbYTM = 1.0;
 
         do {
-            newPrice = 0.0;
-            ytm += 0.001;
-            for (Map.Entry<Double, Double> entry : cashFlow.entrySet()) {
-                double coupon = entry.getValue();
-                double year = entry.getKey();
-                newPrice += coupon / (Math.exp(ytm * year) / 100);
-            }
-           // System.out.println(price + " " + newPrice);
-        } while (price < newPrice);
+            currentPrice = getPriceForYTM(bond, hbYTM);
 
-        return ytm;
+            /* Binary search the value of final ytm */
+            if(currentPrice > price) {
+                lbYTM = hbYTM;
+                hbYTM *= 2;
+            } else if (currentPrice < price) {
+                hbYTM = lbYTM + (hbYTM - lbYTM) /2;
+            } else if (lbYTM == hbYTM) {
+                break;
+            }
+
+        } while ((hbYTM - lbYTM) > 0.001);
+
+        return hbYTM;
+    }
+
+    private double getPriceForYTM(Bond bond, double ytm) {
+        double price = 0.0;
+        Map<Double, Double> cashFlow = bond.getCashFlow();
+        for (Map.Entry<Double, Double> entry : cashFlow.entrySet()) {
+            double coupon = entry.getValue();
+            double year = entry.getKey();
+            price += coupon / (Math.exp((ytm * year) / 100));
+        }
+        return price;
     }
 
     /**
@@ -103,7 +118,6 @@ public class Test {
      */
     public double getPrice(Bond bond, double ytm) {
         double price = 0.0;
-
         price = bond.getFaceValue() * Math.exp(-(ytm * bond.getMaturity()));
         return price;
     }

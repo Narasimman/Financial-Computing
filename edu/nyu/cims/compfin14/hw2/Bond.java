@@ -60,8 +60,9 @@ public class Bond {
     }
 
     public double getCoupon() {
-        coupon = faceValue * (coupon / paymentFrequency);
-        return coupon;
+        double cp = 0.0;
+        cp = faceValue * (coupon / paymentFrequency);
+        return cp;
     }
 
     public double getMaturity() {
