@@ -8,7 +8,7 @@ import edu.nyu.cims.compfin15.montecarlo.RandomVectorGenerator;
 public class MonteCarlo {
 
     public static void main(String[] args) {
-        RandomVectorGenerator rvg = new RandomVectorGenerator();
+        RandomVectorGenerator rvg = new RandomVectorGenerator(10);
         for(int i = 0; i < 6; i++) {
             System.out.println();
             double[] test = rvg.getUniformRandomNumber();

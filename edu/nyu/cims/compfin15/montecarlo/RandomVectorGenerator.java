@@ -7,10 +7,13 @@ import org.apache.commons.math3.random.*;
  * Created by Narasimman on 4/15/2015.
  */
 public class RandomVectorGenerator implements IRandomVectorGenerator {
-    UncorrelatedRandomVectorGenerator r;
+    private UncorrelatedRandomVectorGenerator generator;
     long seed;
 
-    void RandomVectorGenerator(){
+    public RandomVectorGenerator(int mean){
+        JDKRandomGenerator rnd = new JDKRandomGenerator();
+        GaussianRandomGenerator gr = new GaussianRandomGenerator(rnd);
+        this.generator = new UncorrelatedRandomVectorGenerator(mean, gr);
     }
 
     @Override
@@ -19,12 +22,12 @@ public class RandomVectorGenerator implements IRandomVectorGenerator {
     }
 
     @Override
+    /**
+     * Creates a Guassian random generator from a randomnumber generator.
+     * Then we create an instance of the RandomVectorGenerator
+     */
     public double[] getUniformRandomNumber() {
-        JDKRandomGenerator rnd = new JDKRandomGenerator();
-        GaussianRandomGenerator gr = new GaussianRandomGenerator(rnd);
-        r = new UncorrelatedRandomVectorGenerator(1, gr);
-
-        return r.nextVector();
+        return generator.nextVector();
 
     }
 }
