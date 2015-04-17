@@ -29,6 +29,8 @@ public class YieldCurve {
      */
     YieldCurve(List<Bond> bonds) {
         double rate;
+        yCurve.clear();
+        yCurve.put(0.0, 0.0);
         for(Bond bond : bonds) {
             rate = Math.log(bond.getFaceValue() / bond.getPrice()) * bond.getMaturity();
             yCurve.put(bond.getMaturity(), rate);
