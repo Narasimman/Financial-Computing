@@ -8,15 +8,14 @@ import edu.nyu.cims.compfin15.montecarlo.RandomVectorGenerator;
 public class MonteCarlo {
 
     public static void main(String[] args) {
-        RandomVectorGenerator rvg = new RandomVectorGenerator(10);
-        for(int i = 0; i < 6; i++) {
-            System.out.println();
-            double[] test = rvg.getUniformRandomNumber();
+        RandomVectorGenerator rvg = new RandomVectorGenerator(1);
+        AntitheticRandomVectorGenerator arvg = new AntitheticRandomVectorGenerator(rvg);
+        for (int i = 0; i < 10; i++) {
+            double[] test = arvg.getUniformRandomNumber();
             for (int j = 0; j < test.length; j++) {
                 System.out.println(test[j]);
             }
         }
-
     }
 
 
