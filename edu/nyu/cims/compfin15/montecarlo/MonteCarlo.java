@@ -66,7 +66,7 @@ public class MonteCarlo {
             statistics.add(payOut.getValue(stockPath));
 
             if(count % 10000 == 0) {
-                System.out.println(2.0537489106318234 * statistics.getStdVar()/ Math.sqrt(count));
+               // System.out.println(2.0537489106318234 * statistics.getStdVar()/ Math.sqrt(count));
 
             }
 
