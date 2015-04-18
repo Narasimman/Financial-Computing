@@ -3,7 +3,7 @@ package edu.nyu.cims.compfin15.montecarlo;
 /**
  * Created by Narasimman on 4/17/2015.
  */
-public class AntitheticRandomVectorGenerator implements IRandomVectorGenerator {
+public class AntitheticRandomVectorGenerator extends RandomVectorGenerator implements IRandomVectorGenerator{
     private long seed;
     private RandomVectorGenerator generator;
     private double[] antitheticRandomNumber;
@@ -24,7 +24,7 @@ public class AntitheticRandomVectorGenerator implements IRandomVectorGenerator {
             antitheticRandomNumber = generator.getUniformRandomNumber();
         } else {
             for (int i =0; i < antitheticRandomNumber.length; i++) {
-                antitheticRandomNumber[i] = - antitheticRandomNumber[i];
+                antitheticRandomNumber[i] *= -1;
             }
         }
         flip = !flip;

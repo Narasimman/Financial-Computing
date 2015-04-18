@@ -10,11 +10,14 @@ public class RandomVectorGenerator implements IRandomVectorGenerator {
     private UncorrelatedRandomVectorGenerator generator;
     long seed;
 
+    public RandomVectorGenerator() {}
+
     /**
      * @param dimension -
      */
     public RandomVectorGenerator(int dimension){
         JDKRandomGenerator rnd = new JDKRandomGenerator();
+        rnd.setSeed(dimension);
         GaussianRandomGenerator gr = new GaussianRandomGenerator(rnd);
         this.generator = new UncorrelatedRandomVectorGenerator(dimension, gr);
     }
@@ -42,6 +45,5 @@ public class RandomVectorGenerator implements IRandomVectorGenerator {
      */
     public double[] getUniformRandomNumber() {
         return generator.nextVector();
-
     }
 }
