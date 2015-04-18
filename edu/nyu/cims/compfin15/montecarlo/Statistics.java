@@ -7,11 +7,8 @@ import java.util.ArrayList;
  */
 public class Statistics {
     private ArrayList<Double> array;
-    /** The mean of array */
     private double mean = 0;
-    /** The standard deviation of array */
     private double stdVar = 0;
-    /** The second order moment */
     private double meanSq = 0;
 
     public Statistics() {
@@ -19,7 +16,7 @@ public class Statistics {
     }
 
     /**
-     * Add new element into the <code>StatCollector</code>
+     * Add new element
      * @param x new element.
      */
     public void add(double x) {

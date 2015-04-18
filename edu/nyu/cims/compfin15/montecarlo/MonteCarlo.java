@@ -71,7 +71,7 @@ public class MonteCarlo {
             }
 
             if (2.0537489106318234 * statistics.getStdVar()/ Math.sqrt(count) < 0.01 && count > 10000 ) {
-                System.out.println(count+" times simulations to converge!");
+                System.out.println(count+" times simulations!");
                 break;
             }
             count++;
