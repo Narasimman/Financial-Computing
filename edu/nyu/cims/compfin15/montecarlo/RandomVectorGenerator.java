@@ -16,10 +16,7 @@ public class RandomVectorGenerator implements IRandomVectorGenerator {
      * @param dimension -
      */
     public RandomVectorGenerator(int dimension){
-        JDKRandomGenerator rnd = new JDKRandomGenerator();
-        rnd.setSeed(dimension);
-        GaussianRandomGenerator gr = new GaussianRandomGenerator(rnd);
-        this.generator = new UncorrelatedRandomVectorGenerator(dimension, gr);
+        this(dimension, (int) System.currentTimeMillis());
     }
 
     /**

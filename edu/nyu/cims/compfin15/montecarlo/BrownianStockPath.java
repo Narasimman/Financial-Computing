@@ -41,7 +41,7 @@ public class BrownianStockPath implements IPath {
 
     public ArrayList<Pair> getPrices() {
         this.getPath();
-        return paths;
+        return this.paths;
     }
 
     @Override
@@ -51,6 +51,7 @@ public class BrownianStockPath implements IPath {
      * Strikeprice * Math.exp((option.getRateOfInterest() - volatility*volatility/2)+volatility*random)
      */
     public void getPath() {
+        this.paths.clear();
         this.paths.add(new Pair(DateTime.now(), option.getInitialPrice()));
         double[] arvg = generator.getUniformRandomNumber();
         double St = option.getInitialPrice();
