@@ -76,9 +76,9 @@ public class BookOrder {
      * Method to print a trade.
      */
     private void printTrade(String traderId, String tradeId) {
-        String output =
-                "Order " + traderId + " traded with " + tradeId;
-        System.out.println(output);
+        System.out.println("  - - - - - - - -- - - - - - - -- ");
+        System.out.println("||   Order " + traderId + " traded with " + tradeId + "  ||");
+        System.out.println("  - - - - - - - -- - - - - - - -- ");
     }
 
     /**

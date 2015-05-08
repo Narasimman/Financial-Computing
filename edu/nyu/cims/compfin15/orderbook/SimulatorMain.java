@@ -54,7 +54,7 @@ public class SimulatorMain {
 
             }
             if(best) {
-                book.printTopOfBooks();
+                book.printTopOfBooks(msg);
             }
         }
     }

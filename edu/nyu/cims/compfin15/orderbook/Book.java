@@ -80,38 +80,55 @@ public class Book {
     /**
      * Method to print the best (top) of ask and bid books.
      */
-    public void printTopOfBooks() {
+    public void printTopOfBooks(Message msg) {
+        String orderfor = "";
+        if(msg instanceof NewOrder) {
+            NewOrder order = (NewOrder) msg;
+            orderfor = order.getSymbol();
+
+        } else if (msg instanceof OrderCxR) {
+            OrderCxR order = (OrderCxR) msg;
+            orderfor = lookupTable.get(order.getOrderId()).getSymbol();
+        }
+
+        System.out.println("Message for:   " + orderfor);
         System.out.println("Best of the ask book:");
         for (Map.Entry<String, TreeMap<Double, LinkedList<BookOrder>>> entry: askBook.entrySet()) {
             StringBuffer sb = new StringBuffer();
-            sb.append(entry.getKey());
-            sb.append(" ");
             // Skip dead order and only prints live order.
             for (BookOrder order: entry.getValue().firstEntry().getValue()) {
-                if (order.getSize() > 0) {
-                    sb.append(String.format("%.2f", order.getLimitPrice()));
-                    sb.append(",ask,");
-                    sb.append(order.getSize());
+                if (order.getSize() > 0 && order.getSymbol() == orderfor) {
+                    sb.append(entry.getKey());
                     sb.append(" ");
-                }
+                    sb.append(order.getSize());
+                    sb.append(" x ");
+                    sb.append(String.format("%.2f", order.getLimitPrice()));
+                    sb.append(" ask ");
+                    sb.append("\n");
+               }
+
             }
             System.out.println(sb);
         }
+        System.out.println("_ _ _ _ _ _ _ _ _ _ _ _");
         System.out.println("Best of the bid book:");
         for (Map.Entry<String, TreeMap<Double, LinkedList<BookOrder>>> entry: bidBook.entrySet()) {
             StringBuffer sb = new StringBuffer();
-            sb.append(entry.getKey());
-            sb.append(": ");
             for (BookOrder order: entry.getValue().lowerEntry(Double.NaN).getValue()) {
                 // Skip dead order and only prints live order.
-                if (order.getSize() > 0) {
-                    sb.append(String.format("%.2f", order.getLimitPrice()));
-                    sb.append(",bid,");
+
+                if (order.getSize() > 0 && order.getSymbol() == orderfor) {
+                    sb.append(entry.getKey());
+                    sb.append(": ");
                     sb.append(order.getSize());
-                    sb.append(" ");
+                    sb.append(" x ");
+                    sb.append(String.format("%.2f", order.getLimitPrice()));
+                    sb.append(" bid ");
+                    sb.append("\n");
                 }
             }
-            System.out.println(sb);
+            System.out.print(sb);
         }
+        System.out.println("***********************");
     }
 }
