@@ -1,12 +1,9 @@
 package edu.nyu.cims.compfin15.orderbook;
 
-import edu.nyu.cims.compfin15.orderbook.OrdersIterator.*;
-import edu.nyu.cims.compfin15.orderbook.Book;
+import edu.nyu.cims.compfin15.orderbook.OrdersIterator.NewOrderImpl;
+import edu.nyu.cims.compfin15.orderbook.OrdersIterator.OrderCxRImpl;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.TreeMap;
 
 /**
  * Created by Narasimman on 5/6/2015.
@@ -52,6 +49,12 @@ public class SimulatorMain {
 
             } else if (msg instanceof OrderCxR) {
                 OrderCxR orderCxR = (OrderCxRImpl) msg;
+                BookOrder bookOrder = new BookOrder(orderCxR, book);
+                bookOrder.executeCxROrder();
+
+            }
+            if(best) {
+                book.printTopOfBooks();
             }
         }
     }

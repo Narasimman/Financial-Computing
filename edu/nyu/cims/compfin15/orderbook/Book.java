@@ -2,6 +2,7 @@ package edu.nyu.cims.compfin15.orderbook;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -27,7 +28,12 @@ public class Book {
         return bidBook;
     }
 
+    public HashMap<String, BookOrder> getLookupTable() {
+        return lookupTable;
+    }
+
     private void insertIntoBook(BookOrder bookOrder, HashMap<String, TreeMap<Double, LinkedList<BookOrder>>> book) {
+
         TreeMap<Double, LinkedList<BookOrder>> priceMap;
         if(!book.containsKey(bookOrder.getSymbol())) {
             // There is no entry for this Symbol in the book. First order
@@ -49,6 +55,7 @@ public class Book {
                 priceMap.put(bookOrder.getLimitPrice(), list);
             }
         }
+
         lookupTable.put(bookOrder.getOrderId(), bookOrder);
     }
 
@@ -57,6 +64,7 @@ public class Book {
      * @param bookOrder
      */
     public void insertIntoAskBook(BookOrder bookOrder) {
+        //System.out.println("Insert into ask book");
         insertIntoBook(bookOrder, askBook);
     }
 
@@ -65,6 +73,45 @@ public class Book {
      * @param bookOrder
      */
     public void insertIntoBidBook(BookOrder bookOrder) {
+        //System.out.println("Insert into bid book");
         insertIntoBook(bookOrder, bidBook);
+    }
+
+    /**
+     * Method to print the best (top) of ask and bid books.
+     */
+    public void printTopOfBooks() {
+        System.out.println("Best of the ask book:");
+        for (Map.Entry<String, TreeMap<Double, LinkedList<BookOrder>>> entry: askBook.entrySet()) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(entry.getKey());
+            sb.append(" ");
+            // Skip dead order and only prints live order.
+            for (BookOrder order: entry.getValue().firstEntry().getValue()) {
+                if (order.getSize() > 0) {
+                    sb.append(String.format("%.2f", order.getLimitPrice()));
+                    sb.append(",ask,");
+                    sb.append(order.getSize());
+                    sb.append(" ");
+                }
+            }
+            System.out.println(sb);
+        }
+        System.out.println("Best of the bid book:");
+        for (Map.Entry<String, TreeMap<Double, LinkedList<BookOrder>>> entry: bidBook.entrySet()) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(entry.getKey());
+            sb.append(": ");
+            for (BookOrder order: entry.getValue().lowerEntry(Double.NaN).getValue()) {
+                // Skip dead order and only prints live order.
+                if (order.getSize() > 0) {
+                    sb.append(String.format("%.2f", order.getLimitPrice()));
+                    sb.append(",bid,");
+                    sb.append(order.getSize());
+                    sb.append(" ");
+                }
+            }
+            System.out.println(sb);
+        }
     }
 }

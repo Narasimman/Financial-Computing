@@ -1,6 +1,7 @@
 package edu.nyu.cims.compfin15.orderbook;
 
-import java.util.SortedSet;
+import java.util.*;
+import edu.nyu.cims.compfin15.orderbook.OrdersIterator.NewOrderImpl;
 
 /**
  * Created by Narasimman on 5/8/2015.
@@ -36,6 +37,13 @@ public class BookOrder {
         }
     }
 
+    public BookOrder(OrderCxR order, Book book) {
+        this.size = order.getSize();
+        this.orderId = order.getOrderId();
+        this.limitPrice = order.getLimitPrice();
+        this.book = book;
+    }
+
     public String getSymbol() {
         return symbol;
     }
@@ -65,13 +73,57 @@ public class BookOrder {
     }
 
     /**
+     * Method to print a trade.
+     */
+    private void printTrade(String traderId, String tradeId) {
+        String output =
+                "Order " + traderId + " traded with " + tradeId;
+        System.out.println(output);
+    }
+
+    /**
      * This executes the order with the given price
      * @param limitPrice
      * @return
      */
     private int executeLimitOrder(int size, Double limitPrice) {
+        LinkedList<BookOrder> list;
 
-        return size;
+        if(this.type == orderTypes.SELL_LIMIT) {
+            list = book.getBidBook().get(this.getSymbol()).get(limitPrice);
+        } else {
+            list = book.getAskBook().get(this.getSymbol()).get(limitPrice);
+        }
+        int res = size;
+        for (int i = 0; i < list.size(); ++i) {
+            if (res > list.get(i).getSize()) {
+                res -= list.get(i).getSize();
+                if (list.get(i).getSize() != 0) {
+                    String tradedOrderId = list.get(i).getOrderId();
+                    printTrade(this.orderId, tradedOrderId);
+                }
+                // The bid order gets fully executed, removing it from the queue.
+                list.remove(i);
+                --i;
+            } else if (res < list.get(i).getSize()) {
+                String tradedOrderId = list.get(i).getOrderId();
+                printTrade(this.orderId, tradedOrderId);
+                // The sell order gets fully executed.
+                list.get(i).setSize(list.get(i).getSize() - res);
+                res = 0;
+                break;
+            } else {
+                if (list.get(i).getSize() != 0) {
+                    String tradedOrderId = list.get(i).getOrderId();
+                    printTrade(this.orderId, tradedOrderId);
+                }
+                // Both the sell and bid orders get fully executed.
+                res = 0;
+                list.remove(i);
+                break;
+            }
+        }
+        return res;
     }
     /**
      * Execute the limit of with the limit price specified in the order
@@ -79,13 +131,12 @@ public class BookOrder {
      */
     private int executeLimitOrder() {
         int size = this.getSize();
-
         if(this.type == orderTypes.SELL_LIMIT) {
             // This is sell limit order
 
             //Execute market orders at this price first
             if(book.getBidBook().containsKey(Double.NaN)) {
-                size = executeLimitOrder(this.getSize(), Double.NaN);
+                size = this.executeLimitOrder(this.getSize(), Double.NaN);
             }
 
             // After executing the market orders, if the sell limit is still not completed,
@@ -96,7 +147,7 @@ public class BookOrder {
                         book.getBidBook().get(symbol).navigableKeySet().tailSet(this.getLimitPrice());
                 for (Double canPrice: candidatePrices) {
                     if (!canPrice.isNaN()) {
-                        size = executeLimitOrder(size, canPrice.doubleValue());
+                        size = this.executeLimitOrder(size, canPrice.doubleValue());
                         if (size == 0) {
                             break;
                         }
@@ -109,7 +160,7 @@ public class BookOrder {
 
             // Execute market orders first
             if(book.getAskBook().containsKey(Double.NaN)) {
-                size = executeLimitOrder(this.getSize(), Double.NaN);
+                size = this.executeLimitOrder(this.getSize(), Double.NaN);
             }
 
 
@@ -119,7 +170,7 @@ public class BookOrder {
                         book.getAskBook().get(symbol).descendingKeySet().tailSet(this.getLimitPrice());
                 for (Double canPrice: candidatePrices) {
                     if (!canPrice.isNaN()) {
-                        size = executeLimitOrder(size, canPrice.doubleValue());
+                        size = this.executeLimitOrder(size, canPrice.doubleValue());
                         if (size == 0) {
                             break;
                         }
@@ -135,8 +186,53 @@ public class BookOrder {
      * @return
      */
     private int executeMarketOrder() {
-        int size = 0;
-        return size;
+        Set<Map.Entry<Double, LinkedList<BookOrder>>> entrySet;
+        if (this.type == orderTypes.SELL_MARKET) {
+            TreeMap<Double, LinkedList<BookOrder>> priceMap = book.getBidBook().get(symbol);
+            entrySet = priceMap.descendingMap().entrySet();
+        } else {
+            TreeMap<Double, LinkedList<BookOrder>> priceMap = book.getAskBook().get(symbol);
+            entrySet = priceMap.entrySet();
+        }
+        int res = size;
+        for(Map.Entry<Double, LinkedList<BookOrder>> entry : entrySet) {
+            if (!entry.getKey().isNaN()) {
+                LinkedList<BookOrder> list = entry.getValue();
+                for (int i = 0; i < list.size(); ++i) {
+                    if (res > list.get(i).getSize()) {
+                        if (list.get(i).getSize() != 0) {
+                            String tradedOrderId = list.get(i).getOrderId();
+                            printTrade(orderId, tradedOrderId);
+                        }
+                        // The order on book gets fully executed.
+                        res -= list.get(i).getSize();
+                        list.remove(i);
+                        --i;
+                    } else if (res < list.get(i).getSize()) {
+                        String tradedOrderId = list.get(i).getOrderId();
+                        printTrade(orderId, tradedOrderId);
+                        // The new order gets fully executed.
+                        list.get(i).setSize(list.get(i).getSize() - res);
+                        res = 0;
+                        break;
+                    } else {
+                        if (list.get(i).getSize() != 0) {
+                            String tradedOrderId = list.get(i).getOrderId();
+                            printTrade(orderId, tradedOrderId);
+                        }
+                        // Both the new order and the order on book get fully executed.
+                        res = 0;
+                        list.remove(i);
+                        break;
+                    }
+                }
+
+                if (res == 0) {
+                    break;
+                }
+            }
+        }
+        return res;
     }
 
     /**
@@ -145,39 +241,66 @@ public class BookOrder {
      */
     public boolean executeOrder() {
         boolean ret = false;
-        String symbol = this.getSymbol();
-        String orderId = this.getOrderId();
-        double price = this.getLimitPrice();
-        switch (this.type) {
-            case SELL_LIMIT:
-                if(book.getBidBook().containsKey(symbol)) {
-                    int size;
-                    size = this.executeLimitOrder();
-                    ret  = (size == 0)? true : false;
-                }
-                break;
-            case SELL_MARKET:
-                if(book.getBidBook().containsKey(symbol)) {
-                    int size;
-                    size = this.executeMarketOrder();
-                    ret  = (size == 0)? true : false;
-                }
-                break;
-            case BUY_LIMIT:
-                if(book.getAskBook().containsKey(symbol)) {
-                    int size;
-                    size = this.executeLimitOrder();
-                    ret  = (size == 0)? true : false;
-                }
-                break;
-            case BUY_MARKET:
-                if(book.getAskBook().containsKey(symbol)) {
-                    int size;
-                    size = this.executeMarketOrder();
-                    ret  = (size == 0)? true : false;
-                }
-                break;
+        if(this.getSize() != 0) {
+            String symbol = this.getSymbol();
+            switch (this.type) {
+                case SELL_LIMIT:
+                    if (book.getBidBook().containsKey(symbol)) {
+                        int size;
+                        size = this.executeLimitOrder();
+                        ret = (size == 0) ? true : false;
+                    }
+                    break;
+                case SELL_MARKET:
+                    if (book.getBidBook().containsKey(symbol)) {
+                        int size;
+                        size = this.executeMarketOrder();
+                        ret = (size == 0) ? true : false;
+                    }
+                    break;
+                case BUY_LIMIT:
+                    if (book.getAskBook().containsKey(symbol)) {
+                        int size;
+                        size = this.executeLimitOrder();
+                        ret = (size == 0) ? true : false;
+                    }
+                    break;
+                case BUY_MARKET:
+                    if (book.getAskBook().containsKey(symbol)) {
+                        int size;
+                        size = this.executeMarketOrder();
+                        ret = (size == 0) ? true : false;
+                    }
+                    break;
+            }
         }
         return ret;
+    }
+
+    public void executeCxROrder() {
+        // Set the replaced/cancelled order's size to 0
+        book.getLookupTable().get(this.getOrderId()).setSize(0);
+
+        //now, if the size not zero create a new order and put it at the end of the queue in the book
+        if (this.getSize() != 0) {
+            String symbol = book.getLookupTable().get(this.getOrderId()).getSymbol();
+            BookOrder orderOnBook = new BookOrder(new NewOrderImpl(symbol,this.getOrderId(),this.getSize(),this.getLimitPrice()), book);
+
+            // Process sell order.
+            if (this.getSize() < 0) {
+                boolean fullyExecuted = orderOnBook.executeOrder();
+                if (!fullyExecuted) {
+                    book.insertIntoAskBook(orderOnBook);
+                }
+            }
+
+            // Process buy order.
+            if (this.getSize() > 0) {
+                boolean fullyExecuted = orderOnBook.executeOrder();
+                if (!fullyExecuted) {
+                    book.insertIntoBidBook(orderOnBook);
+                }
+            }
+        }
     }
 }
