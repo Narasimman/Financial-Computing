@@ -48,12 +48,14 @@ public class SimulatorMain {
 
 
             } else if (msg instanceof OrderCxR) {
+                // Cancel or replace order
                 OrderCxR orderCxR = (OrderCxRImpl) msg;
                 BookOrder bookOrder = new BookOrder(orderCxR, book);
                 bookOrder.executeCxROrder();
 
             }
             if(best) {
+                // Prints the best of the both books for the name the message belongs to
                 book.printTopOfBooks(msg);
             }
         }

@@ -37,6 +37,12 @@ public class BookOrder {
         }
     }
 
+    /**
+     * This is the construtor to create an istance for the cancel ro replace order.
+     * This is different from the new order since it doesnt have all the information of an order.
+     * @param order
+     * @param book
+     */
     public BookOrder(OrderCxR order, Book book) {
         this.size = order.getSize();
         this.orderId = order.getOrderId();
@@ -89,6 +95,7 @@ public class BookOrder {
     private int executeLimitOrder(int size, Double limitPrice) {
         LinkedList<BookOrder> list;
 
+        // Pull the list from the corresponding book.
         if(this.type == orderTypes.SELL_LIMIT) {
             list = book.getBidBook().get(this.getSymbol()).get(limitPrice);
         } else {
@@ -187,6 +194,7 @@ public class BookOrder {
      */
     private int executeMarketOrder() {
         Set<Map.Entry<Double, LinkedList<BookOrder>>> entrySet;
+        // Depending on the type of the order pull the list either in natural order for buy and descending order for sell.
         if (this.type == orderTypes.SELL_MARKET) {
             TreeMap<Double, LinkedList<BookOrder>> priceMap = book.getBidBook().get(symbol);
             entrySet = priceMap.descendingMap().entrySet();
@@ -197,6 +205,7 @@ public class BookOrder {
         int res = size;
         for(Map.Entry<Double, LinkedList<BookOrder>> entry : entrySet) {
             if (!entry.getKey().isNaN()) {
+                // handle orders at the current market price
                 LinkedList<BookOrder> list = entry.getValue();
                 for (int i = 0; i < list.size(); ++i) {
                     if (res > list.get(i).getSize()) {
@@ -243,6 +252,7 @@ public class BookOrder {
         boolean ret = false;
         if(this.getSize() != 0) {
             String symbol = this.getSymbol();
+            // Based on the order type call the corresponding handler
             switch (this.type) {
                 case SELL_LIMIT:
                     if (book.getBidBook().containsKey(symbol)) {
@@ -277,6 +287,9 @@ public class BookOrder {
         return ret;
     }
 
+    /**
+     * Executes cancel/Replace orders
+     */
     public void executeCxROrder() {
         // Set the replaced/cancelled order's size to 0
         book.getLookupTable().get(this.getOrderId()).setSize(0);

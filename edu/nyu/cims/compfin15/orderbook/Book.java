@@ -13,6 +13,9 @@ public class Book {
     private HashMap<String, TreeMap<Double, LinkedList<BookOrder>>> bidBook;
     private HashMap<String, BookOrder> lookupTable;
 
+    /**
+     * Contructor that initializes all the books
+     */
     public Book() {
         askBook = new HashMap<String, TreeMap<Double, LinkedList<BookOrder>>>();
         bidBook = new HashMap<String, TreeMap<Double, LinkedList<BookOrder>>>();
@@ -32,6 +35,12 @@ public class Book {
         return lookupTable;
     }
 
+    /**
+     * This is a private method that inserts an order item into the book.
+     * This doesnot have the knowledge of which book it is. Abstracted from book
+     * @param bookOrder
+     * @param book
+     */
     private void insertIntoBook(BookOrder bookOrder, HashMap<String, TreeMap<Double, LinkedList<BookOrder>>> book) {
 
         TreeMap<Double, LinkedList<BookOrder>> priceMap;
@@ -97,10 +106,10 @@ public class Book {
             StringBuffer sb = new StringBuffer();
             // Skip dead order and only prints live order.
             for (BookOrder order: entry.getValue().firstEntry().getValue()) {
-                if (order.getSize() > 0 && order.getSymbol() == orderfor) {
+                if (Math.abs(order.getSize()) > 0 && order.getSymbol() == orderfor) {
                     sb.append(entry.getKey());
                     sb.append(" ");
-                    sb.append(order.getSize());
+                    sb.append(Math.abs(order.getSize()));
                     sb.append(" x ");
                     sb.append(String.format("%.2f", order.getLimitPrice()));
                     sb.append(" ask ");
