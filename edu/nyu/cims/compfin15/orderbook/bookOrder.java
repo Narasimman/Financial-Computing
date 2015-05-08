@@ -151,7 +151,7 @@ public class BookOrder {
             if(size > 0) {
                 // Execute prices from low to high
                 SortedSet<Double> candidatePrices =
-                        book.getBidBook().get(symbol).navigableKeySet().tailSet(this.getLimitPrice());
+                        book.getBidBook().get(this.getSymbol()).navigableKeySet().tailSet(this.getLimitPrice());
                 for (Double canPrice: candidatePrices) {
                     if (!canPrice.isNaN()) {
                         size = this.executeLimitOrder(size, canPrice.doubleValue());
@@ -174,7 +174,7 @@ public class BookOrder {
             if(size > 0) {
                 // Execute limit orders if the buy limit is still not completed
                 SortedSet<Double> candidatePrices =
-                        book.getAskBook().get(symbol).descendingKeySet().tailSet(this.getLimitPrice());
+                        book.getAskBook().get(this.getSymbol()).descendingKeySet().tailSet(this.getLimitPrice());
                 for (Double canPrice: candidatePrices) {
                     if (!canPrice.isNaN()) {
                         size = this.executeLimitOrder(size, canPrice.doubleValue());
@@ -196,10 +196,10 @@ public class BookOrder {
         Set<Map.Entry<Double, LinkedList<BookOrder>>> entrySet;
         // Depending on the type of the order pull the list either in natural order for buy and descending order for sell.
         if (this.type == orderTypes.SELL_MARKET) {
-            TreeMap<Double, LinkedList<BookOrder>> priceMap = book.getBidBook().get(symbol);
+            TreeMap<Double, LinkedList<BookOrder>> priceMap = book.getBidBook().get(this.getSymbol());
             entrySet = priceMap.descendingMap().entrySet();
         } else {
-            TreeMap<Double, LinkedList<BookOrder>> priceMap = book.getAskBook().get(symbol);
+            TreeMap<Double, LinkedList<BookOrder>> priceMap = book.getAskBook().get(this.getSymbol());
             entrySet = priceMap.entrySet();
         }
         int res = size;
