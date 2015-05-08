@@ -13,13 +13,19 @@ import java.util.TreeMap;
  */
 public class SimulatorMain {
     private Book book;
-    private HashMap<String, BookOrder> lookupTable;
 
+    /**
+     * Constructor
+     */
     public SimulatorMain() {
         book = new Book();
-        lookupTable = new HashMap<String, BookOrder>();
     }
 
+    /**
+     * This loops through the iterator and executes the order.
+     * @param iterator
+     * @param best
+     */
     private void processOrders(Iterator<Message> iterator, boolean best) {
 
         Message msg;
@@ -28,16 +34,16 @@ public class SimulatorMain {
             msg = iterator.next();
             if (msg instanceof NewOrder) {
                 NewOrder order = (NewOrderImpl) msg;
-                BookOrder bookOrder = new BookOrder(order);
+                BookOrder bookOrder = new BookOrder(order, book);
 
                 // Sell order
                 if(order.getSize() < 0) {
-                    boolean completed = bookOrder.executeOrder(true);
+                    boolean completed = bookOrder.executeOrder();
                     if(!completed) {
                         book.insertIntoAskBook(bookOrder);
                     }
                 } else { // buy order
-                    boolean completed = bookOrder.executeOrder(false);
+                    boolean completed = bookOrder.executeOrder();
                     if(!completed) {
                         book.insertIntoBidBook(bookOrder);
                     }
