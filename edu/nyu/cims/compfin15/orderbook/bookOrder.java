@@ -75,9 +75,9 @@ public class BookOrder {
     /**
      * Method to print a trade.
      */
-    private void printTrade(String traderId, String tradeId) {
+    private void printTrade(String traderId, String tradeId, int size,  double limitPrice) {
         System.out.println("  - - - - - - - -- - - - - - - -- ");
-        System.out.println("||   Order " + traderId + " traded with " + tradeId + "  ||");
+        System.out.println("||   Order "  + Math.abs(size) + " " + traderId + " traded with " + tradeId + " @" + limitPrice + "  ||");
         System.out.println("  - - - - - - - -- - - - - - - -- ");
     }
 
@@ -100,14 +100,14 @@ public class BookOrder {
                 res -= list.get(i).getSize();
                 if (list.get(i).getSize() != 0) {
                     String tradedOrderId = list.get(i).getOrderId();
-                    printTrade(this.orderId, tradedOrderId);
+                    this.printTrade(this.orderId, tradedOrderId, list.get(i).getSize(), limitPrice);
                 }
                 // The bid order gets fully executed, removing it from the queue.
                 list.remove(i);
                 --i;
             } else if (res < list.get(i).getSize()) {
                 String tradedOrderId = list.get(i).getOrderId();
-                printTrade(this.orderId, tradedOrderId);
+                this.printTrade(this.orderId, tradedOrderId, list.get(i).getSize(), limitPrice);
                 // The sell order gets fully executed.
                 list.get(i).setSize(list.get(i).getSize() - res);
                 res = 0;
@@ -115,7 +115,7 @@ public class BookOrder {
             } else {
                 if (list.get(i).getSize() != 0) {
                     String tradedOrderId = list.get(i).getOrderId();
-                    printTrade(this.orderId, tradedOrderId);
+                    this.printTrade(this.orderId, tradedOrderId ,list.get(i).getSize(), limitPrice);
                 }
                 // Both the sell and bid orders get fully executed.
                 res = 0;
@@ -202,7 +202,7 @@ public class BookOrder {
                     if (res > list.get(i).getSize()) {
                         if (list.get(i).getSize() != 0) {
                             String tradedOrderId = list.get(i).getOrderId();
-                            printTrade(orderId, tradedOrderId);
+                            this.printTrade(this.orderId, tradedOrderId, list.get(i).getSize(), entry.getKey());
                         }
                         // The order on book gets fully executed.
                         res -= list.get(i).getSize();
@@ -210,7 +210,7 @@ public class BookOrder {
                         --i;
                     } else if (res < list.get(i).getSize()) {
                         String tradedOrderId = list.get(i).getOrderId();
-                        printTrade(orderId, tradedOrderId);
+                        this.printTrade(this.orderId, tradedOrderId, list.get(i).getSize(), entry.getKey());
                         // The new order gets fully executed.
                         list.get(i).setSize(list.get(i).getSize() - res);
                         res = 0;
@@ -218,7 +218,7 @@ public class BookOrder {
                     } else {
                         if (list.get(i).getSize() != 0) {
                             String tradedOrderId = list.get(i).getOrderId();
-                            printTrade(orderId, tradedOrderId);
+                            this.printTrade(this.orderId, tradedOrderId, list.get(i).getSize(), entry.getKey());
                         }
                         // Both the new order and the order on book get fully executed.
                         res = 0;

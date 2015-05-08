@@ -1,8 +1,6 @@
 package edu.nyu.cims.compfin15.orderbook;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class OrdersIterator {
 

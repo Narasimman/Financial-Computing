@@ -105,6 +105,7 @@ public class Book {
                     sb.append(String.format("%.2f", order.getLimitPrice()));
                     sb.append(" ask ");
                     sb.append("\n");
+                    break;
                }
 
             }
@@ -125,6 +126,7 @@ public class Book {
                     sb.append(String.format("%.2f", order.getLimitPrice()));
                     sb.append(" bid ");
                     sb.append("\n");
+                    break;
                 }
             }
             System.out.print(sb);
