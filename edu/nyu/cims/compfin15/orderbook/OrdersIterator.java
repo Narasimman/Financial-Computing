@@ -67,7 +67,7 @@ public class OrdersIterator {
 
     public OrdersIterator(){
         msgs = new LinkedList<Message>();
-        msgs.add(new NewOrderImpl("IBM","ABC1",1000,100.00));
+        msgs.add(new NewOrderImpl("IBM","ABC1",-1000,100.00));
         msgs.add(new NewOrderImpl("MSFT","XYZ1",1000,100.00));
         msgs.add(new NewOrderImpl("IBM","IBM2",-1000, 99.00));
         msgs.add(new OrderCxRImpl(1200, 101.01, "ABC1"));
